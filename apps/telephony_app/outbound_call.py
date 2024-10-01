@@ -8,8 +8,6 @@ from vocode.streaming.models.telephony import PlivoConfig, TwilioConfig
 
 load_dotenv()
 
-from speller_agent import SpellerAgentConfig
-
 from vocode.streaming.telephony.config_manager.in_memory_config_manager import InMemoryConfigManager
 from vocode.streaming.telephony.conversation.outbound_call import OutboundCall
 
@@ -21,8 +19,8 @@ async def main():
 
     outbound_call = OutboundCall(
         base_url=BASE_URL,
-        to_phone="+15555555555",
-        from_phone="+15555555555",
+        to_phone="+918669145213",
+        from_phone="+14152639423",
         config_manager=config_manager,
         agent_config=ChatGPTAgentConfig(
             initial_message=BaseMessage(text="What up"),

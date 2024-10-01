@@ -62,12 +62,14 @@ class CreateInboundCall(BaseModel):
     conversation_id: Optional[str] = None
     twilio_config: Optional[TwilioConfig] = None
     vonage_config: Optional[VonageConfig] = None
+    plivo_config: Optional[PlivoConfig] = None
 
 
 class EndOutboundCall(BaseModel):
     call_id: str
     vonage_config: Optional[VonageConfig] = None
     twilio_config: Optional[TwilioConfig] = None
+    plivo_config: Optional[PlivoConfig] = None
 
 
 class CreateOutboundCall(BaseModel):
@@ -79,6 +81,7 @@ class CreateOutboundCall(BaseModel):
     conversation_id: Optional[str] = None
     vonage_config: Optional[VonageConfig] = None
     twilio_config: Optional[TwilioConfig] = None
+    plivo_config: Optional[PlivoConfig] = None
     # TODO add IVR/etc.
 
 
@@ -93,6 +96,7 @@ class DialIntoZoomCall(BaseModel):
     conversation_id: Optional[str] = None
     vonage_config: Optional[VonageConfig] = None
     twilio_config: Optional[TwilioConfig] = None
+    plivo_config: Optional[PlivoConfig] = None
 
 
 class CallConfigType(str, Enum):
@@ -182,8 +186,7 @@ class PlivoCallConfig(BaseCallConfig, type=CallConfigType.PLIVO.value):
             sampling_rate=VONAGE_SAMPLING_RATE,
             audio_encoding=VONAGE_AUDIO_ENCODING,
             chunk_size=VONAGE_CHUNK_SIZE,
-            model="phonecall",
-            tier="nova",
+            model="nova-2",
             endpointing_config=PunctuationEndpointingConfig(),
         )
 
@@ -192,7 +195,8 @@ class PlivoCallConfig(BaseCallConfig, type=CallConfigType.PLIVO.value):
         return ElevenLabsSynthesizerConfig(
             sampling_rate=DEFAULT_SAMPLING_RATE,
             audio_encoding=DEFAULT_AUDIO_ENCODING,
+            model_id="eleven_multilingual_v2"
         )
 
 
-TelephonyConfig = Union[TwilioConfig, VonageConfig]
+TelephonyConfig = Union[TwilioConfig, VonageConfig, PlivoConfig]

@@ -62,8 +62,8 @@ class OutboundCall:
         elif isinstance(self.telephony_config, VonageConfig):
             return VonageClient(base_url=self.base_url, maybe_vonage_config=self.telephony_config)
         elif isinstance(self.telephony_config, PlivoConfig):
-            raise ValueError("Plivo not supported for outbound calls")
-
+            return PlivoClient(base_url=self.base_url, maybe_plivo_config=self.telephony_config)
+         
     def create_transcriber_config(
         self, transcriber_config_override: Optional[TranscriberConfig]
     ) -> TranscriberConfig:

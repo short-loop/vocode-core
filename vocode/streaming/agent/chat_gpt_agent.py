@@ -188,6 +188,8 @@ class ChatGPTAgent(RespondAgent[ChatGPTAgentConfigType]):
     ) -> AsyncGenerator[GeneratedResponse, None]:
         assert self.transcript is not None
 
+        print("generate_response: " + str(human_input) + " | " + self.transcript.get_last_user_message()[1])
+
         chat_parameters = {}
         if self.agent_config.vector_db_config:
             try:

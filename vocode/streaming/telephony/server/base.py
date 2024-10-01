@@ -165,6 +165,20 @@ class TelephonyServer:
                 record=vonage_config.record,
             )
 
+        async def plivo_route(plivo_config: PlivoConfig, request: Request):
+            call_config = PlivoCallConfig(
+                transcriber_config=inbound_call_config.transcriber_config
+                or PlivoCallConfig.default_transcriber_config(),
+                agent_config=inbound_call_config.agent_config,
+                synthesizer_config=inbound_call_config.synthesizer_config
+                or PlivoCallConfig.default_synthesizer_config(),
+                plivo_config=plivo_config,
+                plivo_sid=request.form["CallUUID"],
+                from_phone=request.form["From"],
+                to_phone=request.form["To"],
+                direction="inbound",
+            )
+
         if isinstance(inbound_call_config, TwilioInboundCallConfig):
             logger.info(
                 f"Set up inbound call TwiML at https://{self.base_url}{inbound_call_config.url}"
@@ -175,6 +189,11 @@ class TelephonyServer:
                 f"Set up inbound call NCCO at https://{self.base_url}{inbound_call_config.url}"
             )
             return partial(vonage_route, inbound_call_config.vonage_config)
+        elif isinstance(inbound_call_config, PlivoInboundCallConfig):
+            logger.info(
+                f"Set up inbound call NCCO at https://{self.base_url}{inbound_call_config.url}"
+            )
+            return partial(plivo_route, inbound_call_config.plivo_config)
         else:
             raise ValueError(f"Unknown inbound call config type {type(inbound_call_config)}")
 

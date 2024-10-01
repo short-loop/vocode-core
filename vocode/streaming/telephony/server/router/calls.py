@@ -7,7 +7,7 @@ from loguru import logger
 from vocode import sentry_transaction
 from vocode.streaming.agent.abstract_factory import AbstractAgentFactory
 from vocode.streaming.agent.default_factory import DefaultAgentFactory
-from vocode.streaming.models.telephony import BaseCallConfig, TwilioCallConfig, VonageCallConfig
+from vocode.streaming.models.telephony import BaseCallConfig, TwilioCallConfig, VonageCallConfig, PlivoCallConfig
 from vocode.streaming.synthesizer.abstract_factory import AbstractSynthesizerFactory
 from vocode.streaming.synthesizer.default_factory import DefaultSynthesizerFactory
 from vocode.streaming.telephony.config_manager.base_config_manager import BaseConfigManager

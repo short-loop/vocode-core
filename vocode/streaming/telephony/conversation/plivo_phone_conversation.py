@@ -129,7 +129,7 @@ class PlivoPhoneConversation(AbstractPhoneConversation[PlivoOutputDevice]):
             chunk = base64.b64decode(media["payload"])
             self.receive_audio(chunk)
         if data["event"] == "playedStream":
-            chunk_id = data["playedStream"]["name"]
+            chunk_id = data["name"]
             self.output_device.enqueue_mark_message(ChunkFinishedMarkMessage(chunk_id=chunk_id))
         elif data["event"] == "stop":
             logger.debug(f"Media WS: Received event 'stop': {message}")

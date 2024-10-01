@@ -27,12 +27,12 @@ class PlivoClient(AbstractTelephonyClient):
         maybe_plivo_config: Optional[PlivoConfig] = None,
     ):
         self.plivo_config = maybe_plivo_config or PlivoConfig(
-            account_sid=os.environ["PLIVO_ACCOUNT_SID"],
-            auth_token=os.environ["PLIVO_AUTH_TOKEN"],
+            auth_id=PLIVO_AUTH_ID,
+            auth_token=PLIVO_AUTH_TOKEN,
         )
         self.plivo_client = plivo.RestClient(auth_id=PLIVO_AUTH_ID, auth_token=PLIVO_AUTH_TOKEN)
         self.auth = aiohttp.BasicAuth(
-            login=self.plivo_config.account_sid,
+            login=self.plivo_config.auth_id,
             password=self.plivo_config.auth_token,
         )
         super().__init__(base_url=base_url)
@@ -50,8 +50,8 @@ class PlivoClient(AbstractTelephonyClient):
         telephony_params: Optional[Dict[str, str]] = None,
     ) -> str:
         config = {
-            "from": f"+{from_phone}",
-            "to": f"+{to_phone}",
+            "from_": f"+{from_phone}",
+            "to_": f"+{to_phone}",
             "answer_url": self.get_connection_twiml(conversation_id=conversation_id),
             **(telephony_params or {}),
         }
@@ -61,7 +61,7 @@ class PlivoClient(AbstractTelephonyClient):
         
         call = self.plivo_client.calls.create(**config)
 
-        return call["requestUuid"]
+        return call["request_uuid"]
 
     def get_connection_twiml(self, conversation_id: str):
         return f"https://vapi-mum.shortloop.dev/stream/{conversation_id}"

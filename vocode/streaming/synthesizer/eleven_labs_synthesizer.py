@@ -1,3 +1,4 @@
+import os
 import asyncio
 import hashlib
 from typing import Optional
@@ -26,6 +27,9 @@ class ElevenLabsSynthesizer(BaseSynthesizer[ElevenLabsSynthesizerConfig]):
         synthesizer_config: ElevenLabsSynthesizerConfig,
     ):
         super().__init__(synthesizer_config)
+
+        if synthesizer_config.api_key is None:
+            synthesizer_config.api_key = os.environ.get("ELEVENLABS_API_KEY")
 
         assert synthesizer_config.api_key is not None, "API key must be set"
         assert synthesizer_config.voice_id is not None, "Voice ID must be set"

@@ -119,6 +119,7 @@ class PlivoOutputDevice(AbstractOutputDevice):
         await asyncio.gather(send_plivo_messages_task, process_mark_messages_task)
 
     def _send_audio_chunk_and_mark(self, chunk: bytes, chunk_id: str):
+        print("Sending audio chunk")
         media_message = {
             "event": "playAudio",
             "media": {
