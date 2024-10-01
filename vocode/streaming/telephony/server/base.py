@@ -12,6 +12,8 @@ from vocode.streaming.models.agent import AgentConfig
 from vocode.streaming.models.events import RecordingEvent
 from vocode.streaming.models.synthesizer import SynthesizerConfig
 from vocode.streaming.models.telephony import (
+    PlivoCallConfig,
+    PlivoConfig,
     TwilioCallConfig,
     TwilioConfig,
     VonageCallConfig,
@@ -21,6 +23,7 @@ from vocode.streaming.models.transcriber import TranscriberConfig
 from vocode.streaming.synthesizer.abstract_factory import AbstractSynthesizerFactory
 from vocode.streaming.synthesizer.default_factory import DefaultSynthesizerFactory
 from vocode.streaming.telephony.client.abstract_telephony_client import AbstractTelephonyClient
+from vocode.streaming.telephony.client.plivo_client import PlivoClient
 from vocode.streaming.telephony.client.twilio_client import TwilioClient
 from vocode.streaming.telephony.client.vonage_client import VonageClient
 from vocode.streaming.telephony.config_manager.base_config_manager import BaseConfigManager
@@ -45,6 +48,9 @@ class TwilioInboundCallConfig(AbstractInboundCallConfig):
 
 class VonageInboundCallConfig(AbstractInboundCallConfig):
     vonage_config: VonageConfig
+
+class PlivoInboundCallConfig(AbstractInboundCallConfig):
+    plivo_config: PlivoConfig
 
 
 class VonageAnswerRequest(BaseModel):
@@ -188,6 +194,11 @@ class TelephonyServer:
                 base_url=self.base_url, maybe_vonage_config=call_config.vonage_config
             )
             await telephony_client.end_call(call_config.vonage_uuid)
+        elif isinstance(call_config, PlivoCallConfig):
+            telephony_client = PlivoClient(
+                base_url=self.base_url, maybe_plivo_config=call_config.plivo_config
+            )
+            await telephony_client.end_call(call_config.plivo_sid)
         return {"id": conversation_id}
 
     def get_router(self) -> APIRouter:

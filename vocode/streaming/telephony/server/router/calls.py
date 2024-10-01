@@ -14,6 +14,7 @@ from vocode.streaming.telephony.config_manager.base_config_manager import BaseCo
 from vocode.streaming.telephony.conversation.abstract_phone_conversation import (
     AbstractPhoneConversation,
 )
+from vocode.streaming.telephony.conversation.plivo_phone_conversation import PlivoPhoneConversation
 from vocode.streaming.telephony.conversation.twilio_phone_conversation import (
     TwilioPhoneConversation,
 )
@@ -92,6 +93,24 @@ class CallsRouter(BaseRouter):
                 synthesizer_factory=synthesizer_factory,
                 events_manager=events_manager,
                 output_to_speaker=call_config.output_to_speaker,
+                direction=call_config.direction,
+            )
+        elif isinstance(call_config, PlivoCallConfig):
+            return PlivoPhoneConversation(
+                to_phone=call_config.to_phone,
+                from_phone=call_config.from_phone,
+                base_url=base_url,
+                config_manager=config_manager,
+                agent_config=call_config.agent_config,
+                transcriber_config=call_config.transcriber_config,
+                synthesizer_config=call_config.synthesizer_config,
+                plivo_config=call_config.plivo_config,
+                plivo_sid=call_config.plivo_sid,
+                conversation_id=conversation_id,
+                transcriber_factory=transcriber_factory,
+                agent_factory=agent_factory,
+                synthesizer_factory=synthesizer_factory,
+                events_manager=events_manager,
                 direction=call_config.direction,
             )
         else:

@@ -116,6 +116,8 @@ class VonagePhoneConversationActionInput(ActionInput[ParametersType]):
 class TwilioPhoneConversationActionInput(ActionInput[ParametersType]):
     twilio_sid: str
 
+class PlivoPhoneConversationActionInput(ActionInput[ParametersType]):
+    plivo_sid: str
 
 ResponseType = TypeVar("ResponseType", bound=BaseModel)
 

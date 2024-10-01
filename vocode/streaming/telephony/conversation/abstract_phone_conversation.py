@@ -11,6 +11,7 @@ from vocode.streaming.models.events import PhoneCallEndedEvent
 from vocode.streaming.models.synthesizer import SynthesizerConfig
 from vocode.streaming.models.telephony import PhoneCallDirection
 from vocode.streaming.models.transcriber import TranscriberConfig
+from vocode.streaming.output_device.plivo_output_device import PlivoOutputDevice
 from vocode.streaming.output_device.twilio_output_device import TwilioOutputDevice
 from vocode.streaming.output_device.vonage_output_device import VonageOutputDevice
 from vocode.streaming.streaming_conversation import StreamingConversation
@@ -21,7 +22,7 @@ from vocode.streaming.utils import create_conversation_id
 from vocode.streaming.utils.events_manager import EventsManager
 
 TelephonyOutputDeviceType = TypeVar(
-    "TelephonyOutputDeviceType", bound=Union[TwilioOutputDevice, VonageOutputDevice]
+    "TelephonyOutputDeviceType", bound=Union[TwilioOutputDevice, VonageOutputDevice, PlivoOutputDevice]
 )
 
 LOW_INTERRUPT_SENSITIVITY_THRESHOLD = 0.9

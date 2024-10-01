@@ -8,6 +8,7 @@ from vocode.streaming.agent.base_agent import ActionResultAgentInput, AgentInput
 from vocode.streaming.models.actions import ActionInput
 from vocode.streaming.utils.state_manager import (
     AbstractConversationStateManager,
+    PlivoPhoneConversationStateManager,
     TwilioPhoneConversationStateManager,
     VonagePhoneConversationStateManager,
 )
@@ -59,6 +60,13 @@ class ActionsWorker(InterruptibleWorker):
                         self.conversation_state_manager.get_twilio_sid()
                         if isinstance(
                             self.conversation_state_manager, TwilioPhoneConversationStateManager
+                        )
+                        else None
+                    ),
+                    plivo_sid=(
+                        self.conversation_state_manager.get_plivo_uuid()
+                        if isinstance(
+                            self.conversation_state_manager, PlivoPhoneConversationStateManager
                         )
                         else None
                     ),

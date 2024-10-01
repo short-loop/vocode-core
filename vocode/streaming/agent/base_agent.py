@@ -17,6 +17,7 @@ from vocode.streaming.action.base_action import BaseAction
 from vocode.streaming.action.default_factory import DefaultActionFactory
 from vocode.streaming.action.execute_external_action import ExecuteExternalActionVocodeActionConfig
 from vocode.streaming.action.phone_call_action import (
+    PlivoPhoneConversationAction,
     TwilioPhoneConversationAction,
     VonagePhoneConversationAction,
 )
@@ -72,6 +73,7 @@ class AgentInput(TypedModel, type=AgentInputType.BASE.value):  # type: ignore
     conversation_id: str
     vonage_uuid: Optional[str]
     twilio_sid: Optional[str]
+    plivo_sid: Optional[str]
     agent_response_tracker: Optional[asyncio.Event] = None
 
     class Config:
@@ -530,6 +532,16 @@ class RespondAgent(BaseAgent[AgentConfigType]):
                 agent_input.conversation_id,
                 params,
                 agent_input.twilio_sid,
+                user_message_tracker,
+            )
+        elif isinstance(action, PlivoPhoneConversationAction):
+            assert (
+                agent_input.plivo_sid is not None
+            ), "Cannot use PlivoPhoneConversationActionFactory unless the attached conversation is a PlivoPhoneConversation"
+            action_input = action.create_phone_conversation_action_input(
+                agent_input.conversation_id,
+                params,
+                agent_input.plivo_sid,
                 user_message_tracker,
             )
         else:

@@ -2,10 +2,11 @@ from typing import Dict, Sequence, Type
 
 from vocode.streaming.action.abstract_factory import AbstractActionFactory
 from vocode.streaming.action.base_action import BaseAction
-from vocode.streaming.action.dtmf import TwilioDTMF, VonageDTMF
+from vocode.streaming.action.dtmf import PlivoDTMF, TwilioDTMF, VonageDTMF
 from vocode.streaming.action.end_conversation import EndConversation
 from vocode.streaming.action.execute_external_action import ExecuteExternalAction
 from vocode.streaming.action.phone_call_action import (
+    PlivoPhoneConversationAction,
     TwilioPhoneConversationAction,
     VonagePhoneConversationAction,
 )
@@ -29,6 +30,10 @@ VONAGE_ACTIONS: Dict[ActionType, Type[VonagePhoneConversationAction]] = {
 TWILIO_ACTIONS: Dict[ActionType, Type[TwilioPhoneConversationAction]] = {
     ActionType.TRANSFER_CALL: TwilioTransferCall,
     ActionType.DTMF: TwilioDTMF,
+}
+
+PLIVO_ACTIONS: Dict[ActionType, Type[PlivoPhoneConversationAction]] = {
+    ActionType.DTMF: PlivoDTMF,
 }
 
 

@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Optional
 
 from vocode.streaming.models.transcriber import EndpointingConfig
 from vocode.streaming.synthesizer.input_streaming_synthesizer import InputStreamingSynthesizer
+from vocode.streaming.telephony.client.plivo_client import PlivoClient
 from vocode.streaming.telephony.client.twilio_client import TwilioClient
 from vocode.streaming.telephony.client.vonage_client import VonageClient
 from vocode.streaming.utils.redis_conversation_message_queue import RedisConversationMessageQueue
@@ -10,6 +11,9 @@ if TYPE_CHECKING:
     from vocode.streaming.streaming_conversation import StreamingConversation
     from vocode.streaming.telephony.conversation.abstract_phone_conversation import (
         AbstractPhoneConversation,
+    )
+    from vocode.streaming.telephony.conversation.plivo_phone_conversation import (
+        PlivoPhoneConversation,
     )
     from vocode.streaming.telephony.conversation.twilio_phone_conversation import (
         TwilioPhoneConversation,
@@ -167,4 +171,21 @@ class TwilioPhoneConversationStateManager(PhoneConversationStateManager):
         return TwilioClient(
             base_url=self._twilio_phone_conversation.base_url,
             maybe_twilio_config=self.get_twilio_config(),
+        )
+
+class PlivoPhoneConversationStateManager(PhoneConversationStateManager):
+    def __init__(self, conversation: "PlivoPhoneConversation"):
+        super().__init__(conversation=conversation)
+        self._plivo_phone_conversation = conversation
+
+    def get_plivo_config(self):
+        return self._plivo_phone_conversation.plivo_config
+
+    def get_plivo_sid(self):
+        return self._plivo_phone_conversation.plivo_sid
+
+    def create_plivo_client(self):
+        return PlivoClient(
+            base_url=self._plivo_phone_conversation.base_url,
+            maybe_plivo_config=self.get_plivo_config(),
         )

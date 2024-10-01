@@ -5,11 +5,13 @@ from vocode.streaming.action.base_action import ActionConfigType, BaseAction
 from vocode.streaming.models.actions import (
     ActionInput,
     ParametersType,
+    PlivoPhoneConversationActionInput,
     ResponseType,
     TwilioPhoneConversationActionInput,
     VonagePhoneConversationActionInput,
 )
 from vocode.streaming.utils.state_manager import (
+    PlivoPhoneConversationStateManager,
     TwilioPhoneConversationStateManager,
     VonagePhoneConversationStateManager,
 )
@@ -66,4 +68,30 @@ class TwilioPhoneConversationAction(BaseAction[ActionConfigType, ParametersType,
 
     def attach_conversation_state_manager(self, conversation_state_manager: Any):
         assert isinstance(conversation_state_manager, TwilioPhoneConversationStateManager)
+        self.conversation_state_manager = conversation_state_manager
+
+class PlivoPhoneConversationAction(BaseAction[ActionConfigType, ParametersType, ResponseType]):
+    def create_phone_conversation_action_input(
+        self,
+        conversation_id: str,
+        params: Dict[str, Any],
+        plivo_sid: str,
+        user_message_tracker: Optional[asyncio.Event] = None,
+    ) -> PlivoPhoneConversationActionInput[ParametersType]:
+        if "user_message" in params:
+            del params["user_message"]
+        return PlivoPhoneConversationActionInput(
+            action_config=self.action_config,
+            conversation_id=conversation_id,
+            params=self.parameters_type(**params),
+            plivo_sid=plivo_sid,
+            user_message_tracker=user_message_tracker,
+        )
+
+    def get_plivo_sid(self, action_input: ActionInput[ParametersType]) -> str:
+        assert isinstance(action_input, PlivoPhoneConversationActionInput)
+        return action_input.plivo_sid
+
+    def attach_conversation_state_manager(self, conversation_state_manager: Any):
+        assert isinstance(conversation_state_manager, PlivoPhoneConversationStateManager)
         self.conversation_state_manager = conversation_state_manager

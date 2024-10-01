@@ -3,7 +3,11 @@ from typing import Any, Dict, Literal, Optional, Union
 
 from vocode.streaming.models.agent import AgentConfig
 from vocode.streaming.models.model import BaseModel, TypedModel
-from vocode.streaming.models.synthesizer import AzureSynthesizerConfig, SynthesizerConfig
+from vocode.streaming.models.synthesizer import (
+    AzureSynthesizerConfig,
+    ElevenLabsSynthesizerConfig,
+    SynthesizerConfig,
+)
 from vocode.streaming.models.transcriber import (
     DeepgramTranscriberConfig,
     PunctuationEndpointingConfig,
@@ -35,6 +39,12 @@ class VonageConfig(TelephonyProviderConfig):
     api_secret: str
     application_id: str
     private_key: str
+
+
+class PlivoConfig(TelephonyProviderConfig):
+    auth_id: str
+    auth_token: str
+    extra_params: Optional[Dict[str, Any]] = {}
 
 
 class CallEntity(BaseModel):
@@ -89,6 +99,7 @@ class CallConfigType(str, Enum):
     BASE = "call_config_base"
     TWILIO = "call_config_twilio"
     VONAGE = "call_config_vonage"
+    PLIVO = "call_config_plivo"
 
 
 PhoneCallDirection = Literal["inbound", "outbound"]
@@ -158,6 +169,29 @@ class VonageCallConfig(BaseCallConfig, type=CallConfigType.VONAGE.value):  # typ
         return AzureSynthesizerConfig(
             sampling_rate=VONAGE_SAMPLING_RATE,
             audio_encoding=VONAGE_AUDIO_ENCODING,
+        )
+
+
+class PlivoCallConfig(BaseCallConfig, type=CallConfigType.PLIVO.value):
+    plivo_config: PlivoConfig
+    plivo_sid: str
+
+    @staticmethod
+    def default_transcriber_config():
+        return DeepgramTranscriberConfig(
+            sampling_rate=VONAGE_SAMPLING_RATE,
+            audio_encoding=VONAGE_AUDIO_ENCODING,
+            chunk_size=VONAGE_CHUNK_SIZE,
+            model="phonecall",
+            tier="nova",
+            endpointing_config=PunctuationEndpointingConfig(),
+        )
+
+    @staticmethod
+    def default_synthesizer_config():
+        return ElevenLabsSynthesizerConfig(
+            sampling_rate=DEFAULT_SAMPLING_RATE,
+            audio_encoding=DEFAULT_AUDIO_ENCODING,
         )
 
 

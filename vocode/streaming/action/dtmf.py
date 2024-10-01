@@ -4,6 +4,7 @@ from loguru import logger
 from pydantic.v1 import BaseModel, Field
 
 from vocode.streaming.action.phone_call_action import (
+    PlivoPhoneConversationAction,
     TwilioPhoneConversationAction,
     VonagePhoneConversationAction,
 )
@@ -11,6 +12,7 @@ from vocode.streaming.models.actions import ActionConfig as VocodeActionConfig
 from vocode.streaming.models.actions import ActionInput, ActionOutput
 from vocode.streaming.utils.dtmf_utils import DTMFToneGenerator, KeypadEntry
 from vocode.streaming.utils.state_manager import (
+    PlivoPhoneConversationStateManager,
     TwilioPhoneConversationStateManager,
     VonagePhoneConversationStateManager,
 )
@@ -102,3 +104,38 @@ class TwilioDTMF(
             action_type=action_input.action_config.type,
             response=DTMFResponse(success=True),
         )
+    
+class PlivoDTMF(
+    PlivoPhoneConversationAction[DTMFVocodeActionConfig, DTMFParameters, DTMFResponse]
+):
+    description: str = FUNCTION_DESCRIPTION
+    parameters_type: Type[DTMFParameters] = DTMFParameters
+    response_type: Type[DTMFResponse] = DTMFResponse
+    conversation_state_manager: PlivoPhoneConversationStateManager
+
+    def __init__(self, action_config: DTMFVocodeActionConfig):
+        super().__init__(
+            action_config,
+            quiet=True,
+        )
+
+    async def run(self, action_input: ActionInput[DTMFParameters]) -> ActionOutput[DTMFResponse]:
+        buttons = action_input.params.buttons
+        keypad_entries: List[KeypadEntry]
+        try:
+            keypad_entries = [KeypadEntry(button) for button in buttons]
+        except ValueError:
+            logger.warning(f"Invalid DTMF buttons: {buttons}")
+            return ActionOutput(
+                action_type=action_input.action_config.type,
+                response=DTMFResponse(
+                    success=False, message="Invalid DTMF buttons, can only accept 0-9"
+                ),
+            )
+        self.conversation_state_manager._plivo_phone_conversation.output_device.send_dtmf_tones(
+            keypad_entries=keypad_entries
+        )
+        return ActionOutput(
+            action_type=action_input.action_config.type,
+            response=DTMFResponse(success=True),
+)
