@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# import wave
 import asyncio
 import queue
 import random
@@ -957,7 +958,22 @@ class StreamingConversation(AudioPipeline[OutputDeviceType]):
                 "on_interrupt",
                 create_on_interrupt_callback(processed_event),
             )
-            # Prevents the case where we send a chunk after the output device has been interrupted
+            # # Prevents the case where we send a chunk after the output device has been interrupted
+            # def save_chunk_to_wav(chunk_data, chunk_idx, sample_width, channels, framerate):
+            #     filename = f"chunk_{chunk_idx}.wav"
+            #     with wave.open(filename, 'wb') as wf:
+            #         wf.setnchannels(channels)
+            #         wf.setsampwidth(sample_width)
+            #         wf.setframerate(framerate)
+            #         wf.writeframes(chunk_data)
+            #
+            # save_chunk_to_wav(
+            #     chunk_result.chunk,
+            #     chunk_idx,
+            #     sample_width=16,
+            #     channels=1,
+            #     framerate=self.output_device.sampling_rate,
+            # )
             async with self.interrupt_lock:
                 self.output_device.consume_nonblocking(
                     InterruptibleEvent(

@@ -16,7 +16,7 @@ from vocode.streaming.models.actions import (
 )
 from vocode.streaming.models.agent import ChatGPTAgentConfig
 from vocode.streaming.models.message import BaseMessage
-from vocode.streaming.models.synthesizer import AzureSynthesizerConfig
+from vocode.streaming.models.synthesizer import AzureSynthesizerConfig, ElevenLabsSynthesizerConfig
 from vocode.streaming.models.transcriber import (
     DeepgramTranscriberConfig,
     PunctuationEndpointingConfig,
@@ -24,22 +24,13 @@ from vocode.streaming.models.transcriber import (
 from vocode.streaming.output_device.livekit_output_device import LiveKitOutputDevice
 from vocode.streaming.synthesizer.azure_synthesizer import AzureSynthesizer
 from vocode.streaming.transcriber.deepgram_transcriber import DeepgramTranscriber
-
+from vocode.streaming.synthesizer.eleven_labs_synthesizer import ElevenLabsSynthesizer
 
 class Settings(BaseSettings):
 
-    livekit_api_key: str = "ENTER_YOUR_LIVE_KIT_API_KEY"
-    livekit_api_secret: str = "ENTER_YOUR_LIVE_KIT_API_SECRET"
-    livekit_ws_url: str = "ENTER_YOUR_LIVE_KIT_WS_URL"
-
-    # This means a .env file can be used to overload these settings
-    # ex: "OPENAI_API_KEY=my_key" will set openai_api_key over the default above
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
-
+    livekit_api_key: str = os.getenv("LIVEKIT_API_KEY")
+    livekit_api_secret: str = os.getenv("LIVEKIT_API_SECRET")
+    livekit_ws_url: str = os.getenv("LIVEKIT_WS_URL")
 
 async def wait_for_termination(conversation: LiveKitConversation, ctx: JobContext):
     await conversation.wait_for_termination()
@@ -79,12 +70,9 @@ async def entrypoint(ctx: JobContext):
                 ],
             )
         ),
-        synthesizer=AzureSynthesizer(
-            synthesizer_config=AzureSynthesizerConfig.from_output_device(
-                output_device=output_device,
-                voice_name="en-US-AriaNeural",
-            )
-        ),
+        synthesizer=ElevenLabsSynthesizer(
+            synthesizer_config=ElevenLabsSynthesizerConfig.from_output_device(output_device=output_device)
+        )
     )
     await conversation.start_room(ctx.room)
     asyncio.create_task(wait_for_termination(conversation, ctx))

@@ -40,6 +40,7 @@ class LiveKitConversation(StreamingConversation[LiveKitOutputDevice]):
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             self.user_participant = participant
             self.user_track = track
+
             audio_stream = rtc.AudioStream(track)
             self.receive_frames_task = asyncio.create_task(self._receive_frames(audio_stream))
 

@@ -109,7 +109,7 @@ class TranscriberConfig(TypedModel, type=TranscriberType.BASE.value):  # type: i
     @classmethod
     def from_livekit_input_device(cls, **kwargs):
         return cls(
-            sampling_rate=LiveKitConstants.DEFAULT_SAMPLING_RATE,
+            sampling_rate=LiveKitConstants.DEFAULT_INCOMING_SAMPLING_RATE,
             audio_encoding=LiveKitConstants.AUDIO_ENCODING,
             chunk_size=LiveKitConstants.DEFAULT_CHUNK_SIZE,
             **kwargs,

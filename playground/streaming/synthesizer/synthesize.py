@@ -1,4 +1,5 @@
 import time
+import wave
 
 from vocode.streaming.constants import PER_CHUNK_ALLOWANCE_SECONDS
 from vocode.streaming.models.message import BaseMessage
@@ -19,6 +20,14 @@ if __name__ == "__main__":
     load_dotenv()
 
     seconds_per_chunk = 1
+
+    def save_chunk_to_wav(chunk_data, chunk_idx, sample_width, channels, framerate):
+        filename = f"chunk_{chunk_idx}.wav"
+        with wave.open(filename, 'wb') as wf:
+            wf.setnchannels(channels)
+            wf.setsampwidth(sample_width)
+            wf.setframerate(framerate)
+            wf.writeframes(chunk_data)
 
     async def speak(
         synthesizer: BaseSynthesizer,
@@ -41,6 +50,16 @@ if __name__ == "__main__":
             try:
                 start_time = time.time()
                 speech_length_seconds = seconds_per_chunk * (len(chunk_result.chunk) / chunk_size)
+                # persist the chink to file system in wav file
+                save_chunk_to_wav(
+                    chunk_result.chunk,
+                    chunk_idx,
+                    sample_width=16,
+                    channels=1,
+                    framerate=synthesizer.get_synthesizer_config().sampling_rate,
+                )
+
+
                 output_device.consume_nonblocking(
                     InterruptibleEvent(payload=AudioChunk(data=chunk_result.chunk))
                 )
